@@ -36,7 +36,8 @@
     "tailwindcss": "^3.4.5",
     "uuid": "^11.0.5",
     "viem": "^2.23.2",
-    "wagmi": "^2.14.0"
+    "wagmi": "^2.14.0",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@synthetixio/synpress": "3.7.3",

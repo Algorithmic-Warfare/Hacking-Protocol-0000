@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { connect as connectZapp, ParcnetAPI } from "@parcnet-js/app-connector";
 import * as p from "@parcnet-js/podspec";
 import { zAppConfig } from "./config";
 import { POD } from "@pcd/pod";
-
+import { KeyPair, loadUserKeyPair } from "./crypt";
 export type PodVaultStatus = "offline" | "connecting" | "connected";
 
 const query = p.pod({
@@ -14,6 +14,14 @@ export function usePodVault() {
   const [status, setStatus] = useState<PodVaultStatus>("offline");
   const [zApp, setZApp] = useState<ParcnetAPI>();
   const [pods, setPods] = useState<p.PODData[]>([]);
+  const [keyPair, setKeyPair] = useState<KeyPair>();
+
+  // WIP
+  useEffect(() => {
+    if (keyPair) {
+      console.log("keyPair", keyPair);
+    }
+  }, [keyPair]);
 
   const connect = useCallback(async () => {
     if (status !== "offline") {
@@ -31,6 +39,11 @@ export function usePodVault() {
     );
     const sub = await z.pod.collection(zAppConfig.collection).subscribe(query);
     const pods = await z.pod.collection(zAppConfig.collection).query(query);
+    const keyPair = await loadUserKeyPair(
+      z.pod.collection(zAppConfig.collection),
+      (entries) => z.pod.sign(entries)
+    );
+    setKeyPair(keyPair);
     setPods(pods);
     sub.on("update", (pods) => {
       setPods(pods);
